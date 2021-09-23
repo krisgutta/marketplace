@@ -44,12 +44,8 @@ app.post('/transcription', async (req, res) => {
     // https://www.twilio.com/blog/how-to-secure-twilio-webhook-urls-in-nodejs
     const params = req.body;
 
-<<<<<<< HEAD
     log(`fields : ${JSON.stringify(fields)}`);
     log(`params : ${params}`);
-=======
-    log(`params : ${JSON.stringify(params)}`);
->>>>>>> main
 
     const isTest = req.headers['x-test-request'] && req.headers['x-test-request'] == 'yes';
 
