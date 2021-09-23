@@ -22,6 +22,10 @@ const RecordingAnalysis = require('./recording-analysis');
 const username = process.env.ACCOUNT_SID;
 const password = process.env.AUTH_TOKEN;
 
+function log(message, ...args) {
+  console.log(new Date(), message, ...args);
+}
+
 //End point to receive async request from Twilio add-on
 app.post('/transcription', (req, res) => {
   log('Received Request from Twilio Marketplace');
@@ -46,10 +50,9 @@ app.post('/transcription', (req, res) => {
       {}
     );
 
-    log(`fields : ${JSON.stringify(fields)}`);
     log(`params : ${JSON.stringify(params)}`);
 
-    const isTest = false;
+    const isTest = req.headers['x-test-request'] && req.headers['x-test-request'] == 'yes';
 
     validateSignature(req.headers['x-twilio-signature'], params);
 
@@ -58,11 +61,9 @@ app.post('/transcription', (req, res) => {
     res.end();
 
     log(`Reading recording: ${files['audio-data'].path}`);
-
     let bytes = fs.readFileSync(files['audio-data'].path).toString('base64');
 
     const service = new RecordingAnalysis();
-
     service.on('results', (data) => {
 		  log(`Recording Analysis Data : ${JSON.stringify(data)}`);
 		  if (!isTest) {
@@ -74,7 +75,6 @@ app.post('/transcription', (req, res) => {
     service.analyze(bytes);
 
     log(`Removing recording: ${files['audio-data'].path}`);
-
     fs.unlink(files['audio-data'].path, (err) => {
       if (err) {
         console.error(err)
@@ -82,22 +82,6 @@ app.post('/transcription', (req, res) => {
       }
     });
   });
-});
-
-app.post('/transcription-results', urlencodedParser, (req, res) => {
-  console.log('Received Transcription results from Twilio Marketplace');
-  console.log(req.headers);
-
-  let data = JSON.parse(req.body.AddOns);
-
-  log(data);
-
-  if (data.status == 'successful') {
-    console.log(data.results.google_transcriptions.payload); 
-    downloadTranscription(data.results.google_transcriptions.payload[0].url);
-  }
-}).on('error', (err) => {
-  console.log('Error:' + err.message);
 });
 
 //Validate request signature
@@ -143,6 +127,28 @@ async function postResults(url, transcription) {
 	}
 }
 
+//START: The following code is not required for add-on creator
+//The following is to accept requests from Marketplace as a 
+//customer that installed the add-on. 
+//Delete the following code in your actual add-on implementation
+
+//The following end point is to receive results from Marketplace.
+app.post('/transcription-results', urlencodedParser, (req, res) => {
+  console.log('Received Transcription results from Twilio Marketplace');
+  console.log(req.headers);
+
+  let data = JSON.parse(req.body.AddOns);
+
+  log(data);
+
+  if (data.status == 'successful') {
+    console.log(data.results.google_transcriptions.payload); 
+    downloadTranscription(data.results.google_transcriptions.payload[0].url);
+  }
+}).on('error', (err) => {
+  console.log('Error:' + err.message);
+});
+
 //This is here as an example to demonstrate how a customer could download the results from marketplace.
 //The add-on implementation itself does not require code.
 async function downloadTranscription(url) {
@@ -168,8 +174,6 @@ async function downloadTranscription(url) {
   }
 }
 
-function log(message, ...args) {
-  console.log(new Date(), message, ...args);
-}
+//END: End of the code that is not required for creating the add-on
 
 app.listen(8080);
