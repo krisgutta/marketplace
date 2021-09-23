@@ -125,6 +125,8 @@ async function postResults(url, transcription) {
 	}
 }
 
+//This is here as an example to demonstrate how a customer could download the results from marketplace.
+//The add-on implementation itself does not require code.
 async function downloadTranscription(url) {
   console.log('Downloading transcriptions from Twilio Marketplace');
   let instance = axios.create({
