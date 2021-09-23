@@ -19,20 +19,20 @@ The following is a high-level workflow on how the recording analysis add-on work
 
 ### Headers
 
-Twilio will always pass the following set of headers along with the POST request to the Partner API that may be used for security and debugging purposes if the partner so desires.
+Twilio will always pass the following set of headers along with the POST request to your API that may be used for security and debugging purposes.
 
 | Header Name | Value |
 |---|---|
 | X-Twilio-AddOnVersionSid | The unique identifier of the Add-on version being used by the developer. <br>Use it to identify if the developer is using an older version of your Add-on  |
-| X-Twilio-AccountSid | The Account Sid of the partner (your) account. <br>Example : AC05b3911315a1322d1dede66eed740000 |
-| X-Twilio-Signature | The signature of this request, signed by the partner’s account, and used to verify the request came from Twilio unmodified. See the “Validating Requests are coming from Twilio” section here for details of signature algorithm : https://www.twilio.com/docs/api/security <br>Example : 0FqS203W44/lM2UEM+51hRzwat4= |
-| X-Twilio-RequestSid | The unique identifier of this particular partner request.  Used for billing and debugging. <br>Example : MR000009775bb6d43d1cabc4955723fae1 |
+| X-Twilio-AccountSid | The Account Sid of your Twilio Project. <br>Example : AC05b3911315a1322d1dede66eed740000 |
+| X-Twilio-Signature | The signature of this request, signed by your Twilio Project, and used to verify the request came from Twilio unmodified. See the “Validating Requests are coming from Twilio” section here for details of signature algorithm : https://www.twilio.com/docs/api/security <br>Example : 0FqS203W44/lM2UEM+51hRzwat4= |
+| X-Twilio-RequestSid | The unique identifier for this request.  Used for billing and debugging. <br>Example : MR000009775bb6d43d1cabc4955723fae1 |
 | X-Twilio-AddOnSid | The unique identifier for the Add-on being invoked.<br>Use this to identify which of your Add-ons is generating this request. |
 | X-Twilio-AddOnInstallSid | The unique identifier for a developers install of an Add-on.<br>Use this to distinguish between developers using this particular Add-on. |
 
 ### Add-on Request Fields
 
-When the Add-on is called, Twilio can supply the following fields to the partner API.
+When the Add-on is called, Twilio can supply the following fields to your API.
 
 | Field      | Description                                        |
 |------------|----------------------------------------------------|
@@ -46,13 +46,13 @@ When the Add-on is called, Twilio can supply the following fields to the partner
 | Channels   | Number of channels contained in audio              |
 
 
-### Partner API Response Requirements
+### Your API Response Requirements
 
-Both success and error responses are expected to be in a standard JSON object format.  The server is expected to return a 2xx response for all requests, even error requests.  This is to disambiguate partner errors that may affect SLA from legitimately rejected requests due to misconfiguration or other.  For successfully synchronous Add-on requests, a 200 OK response is expected, with a content-type application/json and a JSON object returned in the body.  For successful asynchronous Add-on requests, a 202 Accepted response is expected, with no body returned.  For both sync and async cases error cases, a 200 OK is expected with a content-type application/json and a JSON object describing the error condition.  
+Both success and error responses are expected to be in a standard JSON object format.  The server is expected to return a 2xx response for all requests, even error requests. This is to disambiguate your API errors that may affect SLA from legitimately rejected requests due to misconfiguration or other.  For successfully synchronous Add-on requests, a 200 OK response is expected, with a content-type application/json and a JSON object returned in the body.  For successful asynchronous Add-on requests, a 202 Accepted response is expected, with no body returned.  For both sync and async cases error cases, a 200 OK is expected with a content-type application/json and a JSON object describing the error condition.  
 
-Any 4xx or 5xx errors returned will be considered partner misconfiguration, or outage, will be logged in the error reporting system and will count against the partner's SLA.  For 4xx errors, Twilio will fail the request immediately.  For 5xx errors, Twilio will retry up to N times, or until the TTL has passed.  Partners should expect retries, using the request_sid as an idempotency token.
+Any 4xx or 5xx errors returned will be considered your add-on misconfiguration, or outage, will be logged in the error reporting system and will count against your SLA.  For 4xx errors, Twilio will fail the request immediately.  For 5xx errors, Twilio will retry up to N times, or until the TTL has passed. You should expect retries, using the request_sid as an idempotency token.
 
-For async requests, the partner is responsible for POSTing back the JSON object body to Twilio once the async task is completed.  This JSON body will be the same format as above, for both success or failure
+For async requests, the you are responsible for POSTing back the JSON object body to Twilio once the async task is completed.  This JSON body will be the same format as above, for both success or failure
 
 ### SLA
 
@@ -94,10 +94,10 @@ Test with `npm test` (Make sure test.wav exists in the home directory)
 
 ## Security & Privacy Requirements
 
-It is important to secure communication between Twilio and partners, for both Twilio's security as well as the partners. Because partners are opening up an HTTP endpoint to the public internet, all efforts should be made to make certain that endpoint does not expose the partner to fraud or attack. To ensure this, a number of mechanisms will be in place
+It is important to secure communication between Twilio and your api. Because you are opening up an HTTP endpoint to the public internet, all efforts should be made to make certain that endpoint does not expose you to fraud or attack. To ensure this, a number of mechanisms will be in place
 
 1. Twilio only supports HTTPS/TLSv1.2.
-2. To help mitigate any DDOS attack exposure, Twilio requests can be setup to only come from specific IPs. Twilio will contact partners before adding any IPs to this range. If you require such a setup, let us know. The default behavior is that they will not come from specific IPs.
+2. To help mitigate any DDOS attack exposure, Twilio requests can be setup to only come from specific IPs. Twilio will contact you before adding any IPs to this range. If you require such a setup, let us know. The default behavior is that they will not come from specific IPs.
 
 	>174.129.222.33
 
@@ -107,8 +107,8 @@ It is important to secure communication between Twilio and partners, for both Tw
 
 	>23.21.226.67
 
-3. Twilio signs every request with the partner's shared secret.  Partners are strongly encouraged to validate the signature of the requests they receive to confirm they're coming from their Twilio account.
-4. Twilio sends a unique request SID with each invocation.  Partners are encouraged to treat this as an idempotency token, allowing them to thwart replay attacks
-5. Twilio also sends an invocation date (UTC) and TTL as part of each signed payload.  Checking this TTL (with a reasonable accommodation for clock-skew) allows partners to thwart replay attack.
+3. Twilio signs every request with the your shared secret. You are strongly encouraged to validate the signature of the requests they receive to confirm they're coming from their Twilio account.
+4. Twilio sends a unique request SID with each invocation. You are encouraged to treat this as an idempotency token, allowing them to thwart replay attacks
+5. Twilio also sends an invocation date (UTC) and TTL as part of each signed payload.  Checking this TTL (with a reasonable accommodation for clock-skew) allows you to thwart replay attack.
 
 ## ToDo
