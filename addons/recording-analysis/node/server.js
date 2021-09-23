@@ -35,7 +35,7 @@ app.post('/transcription', async (req, res) => {
 
   const form = formidable({uploadDir: './recordings/'})
 
-  form.parse(req, (err, fields, files) => {
+  form.parse(req, async (err, fields, files) => {
     if (err) {
       console.error('Error', err);
       throw err;
@@ -55,6 +55,8 @@ app.post('/transcription', async (req, res) => {
     res.status(202).send();
     res.end();
 
+    // TODO: This pattern of doing stuff after the response is returned always makes me queasy.
+    // Would you want the user to know this failed?
     log(`Reading recording: ${files['audio-data'].path}`);
     let bytes = fs.readFileSync(files['audio-data'].path).toString('base64');
 
