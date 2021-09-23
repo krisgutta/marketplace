@@ -58,6 +58,7 @@ app.post('/transcription', async (req, res) => {
 
     const isTest = req.headers['x-test-request'] && req.headers['x-test-request'] == 'yes';
 
+    //TODO: This is still broken
     validateSignature(req.headers['x-twilio-signature'], params);
 
     // Request is accepted
