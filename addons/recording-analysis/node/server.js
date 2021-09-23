@@ -14,21 +14,20 @@ const urlencodedParser = bodyParser.urlencoded({ extended: true })
 const axios = require('axios');
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 
+// Get twilio-node from twilio.com/docs/libraries/node
+const client = require('twilio');
+
 const RecordingAnalysis = require('./recording-analysis');
 
 const username = process.env.ACCOUNT_SID;
 const password = process.env.AUTH_TOKEN;
-
-function log(message, ...args) {
-  console.log(new Date(), message, ...args);
-}
 
 //End point to receive async request from Twilio add-on
 app.post('/transcription', (req, res) => {
   log('Received Request from Twilio Marketplace');
 
   // output the headers
-  log(req.headers);
+  log(`headers: ${req.headers}`);
 
   const form = formidable({uploadDir: './recordings/'})
 
@@ -38,18 +37,22 @@ app.post('/transcription', (req, res) => {
       throw err;
     }
 
-    let callback = fields.callback;
-    let channels = fields.channels;
-    let duration = fields.duration;
-    let format = fields.format;
-    let isTest = fields.test && fields.test == 'yes'; 
+    //Create an ordered list of fields
+    const params = Object.keys(fields).sort().reduce(
+      (obj, key) => { 
+        obj[key] = fields[key]; 
+        return obj;
+      },  
+      {}
+    );
 
-    log(`Callback = ${callback}`);
-    log(`channels = ${channels}`);
-    log(`duration = ${duration}`);
-    log(`format = ${format}`);
-    log(`isTest = ${isTest}`);
- 
+    log(`fields : ${JSON.stringify(fields)}`);
+    log(`params : ${JSON.stringify(params)}`);
+
+    const isTest = false;
+
+    validateSignature(req.headers['x-twilio-signature'], params);
+
     // Request is accepted
     res.status(202).send();
     res.end();
@@ -59,15 +62,16 @@ app.post('/transcription', (req, res) => {
     let bytes = fs.readFileSync(files['audio-data'].path).toString('base64');
 
     const service = new RecordingAnalysis();
-	service.on('results', (data) => {
-		log(`Recording Analysis Data : ${JSON.stringify(data)}`);
-		if (!isTest) {
-			postResults(callback, JSON.stringify(data));
-		}
-	});
 
-	log(`kicking off recording analysis`)
-	service.analyze(bytes);
+    service.on('results', (data) => {
+		  log(`Recording Analysis Data : ${JSON.stringify(data)}`);
+		  if (!isTest) {
+			 postResults(params.callback, JSON.stringify(data));
+		  }
+    });
+
+    log(`kicking off recording analysis`)
+    service.analyze(bytes);
 
     log(`Removing recording: ${files['audio-data'].path}`);
 
@@ -95,6 +99,20 @@ app.post('/transcription-results', urlencodedParser, (req, res) => {
 }).on('error', (err) => {
   console.log('Error:' + err.message);
 });
+
+//Validate request signature
+function validateSignature(twilioSignature, params) {
+
+  log(`x-twilio-signature: ${twilioSignature}`);
+
+  // Your Auth Token from twilio.com/console
+  const authToken = process.env.AUTH_TOKEN;
+
+  // The Twilio request URL
+  const url = 'https://streams.ngrok.io/transcription';
+
+  log(client.validateRequest(authToken, twilioSignature, url, params));
+}
 
 //Post results to the Marketplace callback Url
 async function postResults(url, transcription) {
@@ -150,5 +168,8 @@ async function downloadTranscription(url) {
   }
 }
 
+function log(message, ...args) {
+  console.log(new Date(), message, ...args);
+}
 
 app.listen(8080);

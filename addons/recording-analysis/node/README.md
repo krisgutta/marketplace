@@ -11,11 +11,6 @@ The Recording Analysis Integration point allows developers to receive voice reco
 | Conference Recordings          | RECORDING_CONFERENCE | Recording created using [TwiML <Conference> Noun](https://www.twilio.com/docs/voice/twiml/conference#record) or [Conference REST API](https://www.twilio.com/docs/voice/api/conference-participant-resource#create-a-participant) |
 | Dial Verb Recordings           | RECORDING_DIAL       | Recording created using [TwiML <Dial> Verb](https://www.twilio.com/docs/voice/twiml/dial#record)                                                                                                                                  |
 
-### Workflow
-
-The following is a high-level workflow on how the recording analysis add-on works
-
-![Recording Analysis Workflow](./Recording_Analysis_Workflow.png)
 
 ### Headers
 
@@ -62,6 +57,11 @@ Because this request is returned asynchronously, there are no hard requirements.
 
 As an asynchronous Add-on, the response for this is limited to a maximum of 100 MB. Any response larger than this maximum will be failed by Twilio, an error payload will be sent, and the developer will not be billed
 
+### Workflow
+
+The following is a high-level workflow on how the recording analysis add-on works
+
+![Recording Analysis Workflow](./Recording_Analysis_Workflow.png)
 
 ## Installation
 
@@ -71,6 +71,7 @@ Run `npm install`
 
 npm dependencies (contained in the `package.json`):
 
+* twilio
 * axios
 * body-parser
 * dotenv

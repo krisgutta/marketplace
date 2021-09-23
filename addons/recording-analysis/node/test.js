@@ -13,6 +13,7 @@ var config = {
   method: 'post',
   url: 'http://localhost:8080/transcription',
   headers: { 
+    'x-test-request': 'yes',
     'x-twilio-addonsid': 'XB090778263e29a971bc619cb70f2e2305', 
     'x-twilio-addonversionsid': 'XCc0af24bc3cd41b49b4b1dec95b998710', 
     'x-twilio-vendoraccountsid': 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', 
