@@ -23,7 +23,7 @@ const username = process.env.ACCOUNT_SID;
 const password = process.env.AUTH_TOKEN;
 
 //End point to receive async request from Twilio add-on
-app.post('/transcription', (req, res) => {
+app.post('/transcription', async (req, res) => {
   log('Received Request from Twilio Marketplace');
 
   // output the headers
@@ -70,8 +70,9 @@ app.post('/transcription', (req, res) => {
 		  }
     });
 
-    log(`kicking off recording analysis`)
-    service.analyze(bytes);
+    log(`kicking off recording analysis`);
+    // Analyze is an asynchronous method
+    await service.analyze(bytes);
 
     log(`Removing recording: ${files['audio-data'].path}`);
 
