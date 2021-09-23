@@ -27,7 +27,7 @@ function log(message, ...args) {
 }
 
 //End point to receive async request from Twilio add-on
-app.post('/transcription', (req, res) => {
+app.post('/transcription', async (req, res) => {
   log('Received Request from Twilio Marketplace');
 
   // output the headers
@@ -41,16 +41,11 @@ app.post('/transcription', (req, res) => {
       throw err;
     }
 
-    //Create an ordered list of fields
-    const params = Object.keys(fields).sort().reduce(
-      (obj, key) => { 
-        obj[key] = fields[key]; 
-        return obj;
-      },  
-      {}
-    );
+    // https://www.twilio.com/blog/how-to-secure-twilio-webhook-urls-in-nodejs
+    const params = req.body;
 
-    log(`params : ${JSON.stringify(params)}`);
+    log(`fields : ${JSON.stringify(fields)}`);
+    log(`params : ${params}`);
 
     const isTest = req.headers['x-test-request'] && req.headers['x-test-request'] == 'yes';
 
@@ -71,8 +66,9 @@ app.post('/transcription', (req, res) => {
 		  }
     });
 
-    log(`kicking off recording analysis`)
-    service.analyze(bytes);
+    log(`kicking off recording analysis`);
+    // Analyze is an asynchronous method
+    await service.analyze(bytes);
 
     log(`Removing recording: ${files['audio-data'].path}`);
     fs.unlink(files['audio-data'].path, (err) => {
@@ -93,6 +89,7 @@ function validateSignature(twilioSignature, params) {
   const authToken = process.env.AUTH_TOKEN;
 
   // The Twilio request URL
+  // TODO: Store this in the environment or pass it in?
   const url = 'https://streams.ngrok.io/transcription';
 
   log(client.validateRequest(authToken, twilioSignature, url, params));
