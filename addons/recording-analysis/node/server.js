@@ -31,7 +31,8 @@ app.post('/transcription', async (req, res) => {
   log('Received Request from Twilio Marketplace');
 
   // output the headers
-  log(`headers: ${req.headers}`);
+  //log(`headers: ${JSON.stringify(req.headers)}`);
+  log(req.headers);
 
   const form = formidable({uploadDir: './recordings/'})
 
@@ -42,10 +43,18 @@ app.post('/transcription', async (req, res) => {
     }
 
     // https://www.twilio.com/blog/how-to-secure-twilio-webhook-urls-in-nodejs
-    const params = req.body;
+    //const params = req.body;
+    //Create an ordered list of fields
+    const params = Object.keys(fields).sort().reduce(
+      (obj, key) => { 
+        obj[key] = fields[key]; 
+        return obj;
+      },  
+      {}
+    );
 
-    log(`fields : ${JSON.stringify(fields)}`);
-    log(`params : ${params}`);
+    //log(`fields : ${JSON.stringify(fields)}`);
+    log(params);
 
     const isTest = req.headers['x-test-request'] && req.headers['x-test-request'] == 'yes';
 
@@ -132,7 +141,7 @@ async function postResults(url, transcription) {
 //Delete the following code in your actual add-on implementation
 
 //The following end point is to receive results from Marketplace.
-app.post('/transcription-results', urlencodedParser, (req, res) => {
+app.post('/transcription-results', urlencodedParser, async (req, res) => {
   console.log('Received Transcription results from Twilio Marketplace');
   console.log(req.headers);
 
@@ -142,7 +151,7 @@ app.post('/transcription-results', urlencodedParser, (req, res) => {
 
   if (data.status == 'successful') {
     console.log(data.results.google_transcriptions.payload); 
-    downloadTranscription(data.results.google_transcriptions.payload[0].url);
+    await downloadTranscription(data.results.google_transcriptions.payload[0].url);
   }
 }).on('error', (err) => {
   console.log('Error:' + err.message);
