@@ -49,7 +49,9 @@ When the Add-on is called, Twilio can supply the following fields to the partner
 ### Partner API Response Requirements
 
 Both success and error responses are expected to be in a standard JSON object format.  The server is expected to return a 2xx response for all requests, even error requests.  This is to disambiguate partner errors that may affect SLA from legitimately rejected requests due to misconfiguration or other.  For successfully synchronous Add-on requests, a 200 OK response is expected, with a content-type application/json and a JSON object returned in the body.  For successful asynchronous Add-on requests, a 202 Accepted response is expected, with no body returned.  For both sync and async cases error cases, a 200 OK is expected with a content-type application/json and a JSON object describing the error condition.  
+
 Any 4xx or 5xx errors returned will be considered partner misconfiguration, or outage, will be logged in the error reporting system and will count against the partner's SLA.  For 4xx errors, Twilio will fail the request immediately.  For 5xx errors, Twilio will retry up to N times, or until the TTL has passed.  Partners should expect retries, using the request_sid as an idempotency token.
+
 For async requests, the partner is responsible for POSTing back the JSON object body to Twilio once the async task is completed.  This JSON body will be the same format as above, for both success or failure
 
 ### SLA
@@ -98,9 +100,13 @@ It is important to secure communication between Twilio and partners, for both Tw
 2. To help mitigate any DDOS attack exposure, Twilio requests can be setup to only come from specific IPs. Twilio will contact partners before adding any IPs to this range. If you require such a setup, let us know. The default behavior is that they will not come from specific IPs.
 
 	>174.129.222.33
+
 	>174.129.222.200
+
 	>184.73.170.150
+
 	>23.21.226.67
+
 3. Twilio signs every request with the partner's shared secret.  Partners are strongly encouraged to validate the signature of the requests they receive to confirm they're coming from their Twilio account.
 4. Twilio sends a unique request SID with each invocation.  Partners are encouraged to treat this as an idempotency token, allowing them to thwart replay attacks
 5. Twilio also sends an invocation date (UTC) and TTL as part of each signed payload.  Checking this TTL (with a reasonable accommodation for clock-skew) allows partners to thwart replay attack.
