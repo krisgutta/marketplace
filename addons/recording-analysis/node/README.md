@@ -1,4 +1,4 @@
-#Recording Analysis Example
+# Recording Analysis Example
 
 This example demonstrates creating a Twilio Marketplace add-on for recording analysis integration point. 
 
@@ -12,3 +12,40 @@ The Recording Analysis Integration point allows developers to receive voice reco
 |Conference Recordings|RECORDING_CONFERENCE|Recording created using [TwiML <Conference> Noun](https://www.twilio.com/docs/voice/twiml/conference#record) or [Conference REST API](https://www.twilio.com/docs/voice/api/conference-participant-resource#create-a-participant)|
 |Dial Verb Recordings|RECORDING_DIAL|Recording created using [TwiML <Dial> Verb](https://www.twilio.com/docs/voice/twiml/dial#record)|
 
+### Workflow
+
+The following is a high-level workflow on how the recording analysis add-on works
+
+![Recording Analysis Workflow](./Recording_Analysis_Workflow.png)
+
+### Installation
+
+**Requires Node >= v12.1.0**
+
+Run `npm install`
+
+npm dependencies (contained in the `package.json`):
+
+* axios
+* body-parser
+* dotenv
+* events
+* express
+* form-data
+* formidable
+* fs
+
+#### Running the server
+
+Start with `npm start` (Runs on port 8080)
+
+Test with `npm test` (Make sure test.wav exists in the home directory)
+
+## Setup
+
+1. Create environment file `cp .env.example .env`
+2. Update ACCOUNT_SID and AUTH_TOKEN, you can retrieive your Twilio credentials using Twilio console, https://www.twilio.com/console/project/settings
+
+## Limits
+
+## ToDo
