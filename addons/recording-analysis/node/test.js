@@ -5,7 +5,7 @@ var data = new FormData();
 data.append('callback', '');
 data.append('channels', '2');
 data.append('duration', '4');
-data.append('audio-data', fs.createReadStream('/Users/kgutta/Downloads/upload_dcd5acec8bfe26340e893920c444362c'));
+data.append('audio-data', fs.createReadStream('./test.wav'));
 data.append('format', 'audio/x-wav');
 data.append('test', 'yes');
 
