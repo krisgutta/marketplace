@@ -1,0 +1,21 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "An example demonstrating incoming-voice-call add-on implementation",
+  "main": "server.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/krisgutta/marketplace/tree/main/addons/recording-analysis/node"
+  },
+  "author": "Kris Gutta <kgutta@twilio.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^15.0.0",
+    "events": "^3.3.0",
+    "express": "^4.17.2",
+    "twilio": "^3.73.1"
+  }
+}
