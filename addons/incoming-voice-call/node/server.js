@@ -2,29 +2,27 @@
 require('dotenv').config();
 
 const express = require('express');
+const IncomingCall = require('./incoming-call');
 const app = express();
-
-// Get twilio-node from twilio.com/docs/libraries/node
-const client = require('twilio');
-
-const username = process.env.ACCOUNT_SID;
-const password = process.env.AUTH_TOKEN;
 
 function log(message, ...args) {
   console.log(new Date(), message, ...args);
-}
+} 
 
 app.get('/incoming-call', function(req, res) {
   log('Received request from Twilio Marketplace');
 
+  //TODO Add signature validation
+
   // output the headers
-  //log(`headers: ${JSON.stringify(req.headers)}`);
   log(req.headers);
 
   //log query parameters
   log(req.query);
 
-   res.end();
+  const service = new IncomingCall();
+  res.status(200).json(service.fetchInfo(req.query['phone']));
 });
+
 
 app.listen(8080);
