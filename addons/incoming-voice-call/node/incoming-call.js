@@ -1,5 +1,5 @@
 
-const response = {'caller_name' : 'Hello World', 'caller_type': 'PERSONAL'};
+const response = {'customer_name' : 'Hello World', 'customer_type': 'PERSONAL'};
 
 class IncomingCall {
 
