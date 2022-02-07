@@ -1,0 +1,11 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "An example to demonstrate lookups add-on implementation",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Kris Gutta <kgutta@twilio.com>",
+  "license": "MIT"
+}
